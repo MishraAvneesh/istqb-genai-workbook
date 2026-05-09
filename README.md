@@ -2,8 +2,6 @@
 
 > **Interactive study workbook for the ISTQB Certified Tester — Testing with Generative AI (CT-GenAI) v1.0 exam**
 
-🔗 **Live site:** `https://YOUR_USERNAME.github.io/istqb-genai-workbook`
-
 ---
 
 ## What's Inside
@@ -31,8 +29,6 @@
 - [ChatGPT](https://chat.openai.com) — GPT-4o free tier
 - [Claude](https://claude.ai) — Free tier
 - [NotebookLM](https://notebooklm.google.com) — Free RAG tool by Google
-- [Gemini](https://gemini.google.com) — Free tier
-- [Perplexity AI](https://perplexity.ai) — Free AI + web search
 
 ## Exam Info
 
