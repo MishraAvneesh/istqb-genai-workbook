@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ISTQB CT-GenAI · Hands-On Project Workbook</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+/* ── RESET & TOKENS ───────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e1a;
+  --surface:#111827;
+  --card:#151f30;
+  --border:#1e2d45;
+  --accent:#38bdf8;
+  --accent2:#f472b6;
+  --accent3:#34d399;
+  --accent4:#fbbf24;
+  --accent5:#a78bfa;
+  --text:#e2e8f0;
+  --muted:#64748b;
+  --white:#f8fafc;
+  --font-head:'Syne',sans-serif;
+  --font-mono:'Space Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-mono);min-height:100vh;overflow-x:hidden}
+
+/* ── HERO ─────────────────────────────────────────────────────── */
+.hero{
+  position:relative;min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  padding:2rem;overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%,#0f3460 0%,transparent 70%),
+             radial-gradient(ellipse 50% 40% at 80% 80%,#1a0a2e 0%,transparent 60%),
+             var(--bg);
+}
+.grid-lines{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(56,189,248,.04) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(56,189,248,.04) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+.hero-content{position:relative;z-index:2;max-width:780px}
+.badge{
+  display:inline-block;font-family:var(--font-mono);font-size:.7rem;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--accent);
+  border:1px solid var(--accent);border-radius:999px;padding:.35rem 1rem;
+  margin-bottom:1.5rem;animation:fadeDown .6s ease both;
+}
+.hero h1{
+  font-family:var(--font-head);font-size:clamp(2.2rem,6vw,4rem);
+  font-weight:800;line-height:1.1;color:var(--white);
+  animation:fadeDown .7s .1s ease both;
+}
+.hero h1 span{color:var(--accent)}
+.hero p{
+  margin:1.2rem auto;max-width:560px;font-size:.9rem;line-height:1.8;
+  color:var(--muted);animation:fadeDown .7s .2s ease both;
+}
+.hero-cta{
+  display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;
+  margin-top:1.8rem;animation:fadeDown .7s .3s ease both;
+}
+.btn{
+  padding:.75rem 1.8rem;border-radius:8px;font-family:var(--font-mono);
+  font-size:.82rem;font-weight:700;cursor:pointer;text-decoration:none;
+  transition:all .2s;display:inline-flex;align-items:center;gap:.5rem;
+  letter-spacing:.04em;
+}
+.btn-primary{background:var(--accent);color:#0a0e1a;border:2px solid var(--accent)}
+.btn-primary:hover{background:transparent;color:var(--accent);transform:translateY(-2px)}
+.btn-outline{background:transparent;color:var(--text);border:2px solid var(--border)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px)}
+
+/* stats row */
+.stats{
+  display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;
+  margin-top:2.5rem;animation:fadeDown .7s .4s ease both;
+}
+.stat{text-align:center}
+.stat-n{font-family:var(--font-head);font-size:2rem;font-weight:800;color:var(--accent)}
+.stat-l{font-size:.7rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+
+/* scroll hint */
+.scroll-hint{
+  position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);
+  color:var(--muted);font-size:.75rem;display:flex;flex-direction:column;
+  align-items:center;gap:.4rem;animation:pulse 2s infinite;
+}
+.scroll-hint svg{animation:bounceY 1.5s infinite}
+
+/* ── NAV ──────────────────────────────────────────────────────── */
+nav{
+  position:sticky;top:0;z-index:100;background:rgba(10,14,26,.92);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);
+  padding:.75rem 2rem;display:flex;gap:.5rem;overflow-x:auto;
+}
+nav a{
+  white-space:nowrap;text-decoration:none;font-size:.75rem;
+  font-family:var(--font-mono);letter-spacing:.06em;padding:.4rem .9rem;
+  border-radius:6px;color:var(--muted);transition:all .2s;border:1px solid transparent;
+}
+nav a:hover,nav a.active{color:var(--accent);border-color:var(--accent);background:rgba(56,189,248,.08)}
+
+/* ── MAIN LAYOUT ──────────────────────────────────────────────── */
+main{max-width:900px;margin:0 auto;padding:3rem 1.5rem 6rem}
+
+/* section headers */
+.section-header{margin-bottom:2rem}
+.section-tag{
+  font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;
+  font-family:var(--font-mono);margin-bottom:.5rem;display:block;
+}
+.section-title{
+  font-family:var(--font-head);font-size:clamp(1.5rem,3.5vw,2.2rem);
+  font-weight:800;color:var(--white);line-height:1.2;
+}
+.section-sub{color:var(--muted);font-size:.875rem;margin-top:.5rem;line-height:1.7}
+
+/* ── CHAPTER CARDS ────────────────────────────────────────────── */
+.chapter-grid{display:flex;flex-direction:column;gap:2rem}
+.chapter-card{
+  border:1px solid var(--border);border-radius:16px;background:var(--card);
+  overflow:hidden;transition:border-color .3s;
+}
+.chapter-card:hover{border-color:var(--ch-color,var(--accent))}
+.ch-header{
+  padding:1.5rem 1.8rem;display:flex;align-items:flex-start;gap:1.2rem;
+  border-bottom:1px solid var(--border);cursor:pointer;
+  background:linear-gradient(135deg,rgba(255,255,255,.03) 0%,transparent 100%);
+}
+.ch-icon{
+  width:52px;height:52px;border-radius:12px;display:flex;align-items:center;
+  justify-content:center;font-size:1.5rem;flex-shrink:0;
+  background:color-mix(in srgb, var(--ch-color) 15%, transparent);
+  border:1px solid color-mix(in srgb, var(--ch-color) 30%, transparent);
+}
+.ch-meta{flex:1}
+.ch-num{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ch-color);margin-bottom:.25rem}
+.ch-title{font-family:var(--font-head);font-size:1.05rem;font-weight:700;color:var(--white);margin-bottom:.3rem}
+.ch-desc{font-size:.8rem;color:var(--muted);line-height:1.6}
+.ch-weight{
+  font-size:.72rem;background:color-mix(in srgb,var(--ch-color) 15%,transparent);
+  color:var(--ch-color);padding:.25rem .7rem;border-radius:999px;white-space:nowrap;
+  border:1px solid color-mix(in srgb,var(--ch-color) 30%,transparent);flex-shrink:0;align-self:flex-start;
+}
+.ch-toggle{
+  color:var(--muted);font-size:1.2rem;flex-shrink:0;transition:transform .3s;
+  align-self:center;
+}
+.ch-header.open .ch-toggle{transform:rotate(180deg)}
+
+/* chapter body */
+.ch-body{display:none;padding:1.8rem}
+.ch-body.open{display:block}
+
+/* project block */
+.project-block{margin-bottom:2rem}
+.project-label{
+  font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ch-color);font-family:var(--font-mono);margin-bottom:.5rem;
+}
+.project-name{
+  font-family:var(--font-head);font-size:1.1rem;font-weight:700;
+  color:var(--white);margin-bottom:.6rem;
+}
+.project-desc{font-size:.85rem;color:var(--muted);line-height:1.75;margin-bottom:1rem}
+
+/* llm badge */
+.llm-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.2rem}
+.llm-badge{
+  font-size:.72rem;padding:.3rem .7rem;border-radius:6px;
+  font-family:var(--font-mono);
+}
+
+/* steps */
+.steps{display:flex;flex-direction:column;gap:.75rem}
+.step{
+  display:flex;gap:1rem;align-items:flex-start;
+  padding:1rem 1.2rem;border-radius:10px;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+}
+.step-n{
+  width:28px;height:28px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0;
+  background:color-mix(in srgb,var(--ch-color) 20%,transparent);
+  color:var(--ch-color);border:1px solid color-mix(in srgb,var(--ch-color) 40%,transparent);
+}
+.step-text{font-size:.84rem;line-height:1.7;color:var(--text)}
+.step-text strong{color:var(--ch-color)}
+
+/* prompt template */
+.prompt-box{
+  background:#0d1424;border:1px solid var(--border);border-radius:10px;
+  padding:1.2rem;margin-top:1.2rem;position:relative;
+}
+.prompt-box-label{
+  position:absolute;top:-10px;left:1rem;
+  background:#0d1424;padding:0 .5rem;font-size:.65rem;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--accent4);
+  font-family:var(--font-mono);
+}
+.prompt-box pre{
+  font-size:.78rem;line-height:1.7;color:#94a3b8;
+  white-space:pre-wrap;word-break:break-word;font-family:var(--font-mono);
+}
+.prompt-box pre .hl{color:var(--accent4)}
+.copy-btn{
+  position:absolute;top:.6rem;right:.6rem;background:var(--border);
+  border:none;color:var(--muted);padding:.3rem .6rem;border-radius:5px;
+  font-size:.65rem;cursor:pointer;font-family:var(--font-mono);transition:all .2s;
+}
+.copy-btn:hover{background:var(--accent);color:#000}
+
+/* outcome */
+.outcome{
+  margin-top:1.2rem;padding:1rem 1.2rem;border-radius:10px;
+  background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.2);
+}
+.outcome-label{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent3);margin-bottom:.4rem}
+.outcome p{font-size:.82rem;color:var(--text);line-height:1.7}
+
+/* checklist */
+.checklist{margin-top:1.2rem;display:flex;flex-direction:column;gap:.4rem}
+.check-item{
+  display:flex;align-items:center;gap:.7rem;cursor:pointer;
+  padding:.5rem .8rem;border-radius:8px;transition:background .2s;
+  border:1px solid transparent;
+}
+.check-item:hover{background:rgba(255,255,255,.03);border-color:var(--border)}
+.check-item input[type=checkbox]{
+  width:16px;height:16px;accent-color:var(--ch-color);cursor:pointer;flex-shrink:0;
+}
+.check-item label{font-size:.82rem;color:var(--text);cursor:pointer;line-height:1.5}
+.check-item.done label{text-decoration:line-through;color:var(--muted)}
+
+/* ── FREE LLM SECTION ─────────────────────────────────────────── */
+.llm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;margin-top:1.5rem}
+.llm-card{
+  border:1px solid var(--border);border-radius:14px;padding:1.4rem;
+  background:var(--card);transition:all .3s;position:relative;overflow:hidden;
+}
+.llm-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--lc,var(--accent));
+}
+.llm-card:hover{border-color:var(--lc,var(--accent));transform:translateY(-3px)}
+.llm-card-top{display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem}
+.llm-logo{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;background:rgba(255,255,255,.06)}
+.llm-name{font-family:var(--font-head);font-size:1rem;font-weight:700;color:var(--white)}
+.llm-free{font-size:.65rem;background:rgba(52,211,153,.15);color:var(--accent3);padding:.2rem .55rem;border-radius:999px;margin-left:.4rem}
+.llm-desc{font-size:.8rem;color:var(--muted);line-height:1.65;margin-bottom:.8rem}
+.llm-caps{display:flex;gap:.4rem;flex-wrap:wrap}
+.cap{font-size:.65rem;padding:.2rem .5rem;border-radius:5px;background:rgba(255,255,255,.05);color:var(--text);border:1px solid var(--border)}
+.llm-link{
+  display:inline-flex;align-items:center;gap:.4rem;margin-top:.9rem;
+  font-size:.75rem;color:var(--lc,var(--accent));text-decoration:none;
+  font-family:var(--font-mono);transition:opacity .2s;
+}
+.llm-link:hover{opacity:.7}
+
+/* ── GITHUB SECTION ───────────────────────────────────────────── */
+.gh-steps{display:flex;flex-direction:column;gap:1rem;margin-top:1.5rem}
+.gh-step{
+  display:flex;gap:1.2rem;padding:1.2rem 1.4rem;border-radius:12px;
+  border:1px solid var(--border);background:var(--card);align-items:flex-start;
+}
+.gh-num{
+  width:34px;height:34px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0;
+  background:rgba(56,189,248,.15);color:var(--accent);border:1px solid rgba(56,189,248,.3);
+}
+.gh-content{flex:1}
+.gh-title{font-family:var(--font-head);font-size:.95rem;font-weight:700;color:var(--white);margin-bottom:.4rem}
+.gh-desc{font-size:.82rem;color:var(--muted);line-height:1.65}
+.code-block{
+  background:#0d1424;border:1px solid var(--border);border-radius:8px;
+  padding:.8rem 1rem;margin-top:.7rem;font-family:var(--font-mono);
+  font-size:.76rem;color:#94a3b8;position:relative;
+}
+.code-block .cmd{color:var(--accent3)}
+.code-block .cmt{color:var(--muted)}
+
+/* ── PROGRESS TRACKER ─────────────────────────────────────────── */
+.progress-bar-wrap{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:1.5rem;margin-bottom:2.5rem;
+}
+.prog-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.prog-title{font-family:var(--font-head);font-size:1rem;font-weight:700;color:var(--white)}
+.prog-pct{font-size:.85rem;color:var(--accent);font-family:var(--font-mono)}
+.bar{height:8px;background:var(--border);border-radius:999px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent5));border-radius:999px;transition:width .5s ease;width:0%}
+.prog-labels{display:flex;justify-content:space-between;margin-top:.5rem}
+.prog-label{font-size:.65rem;color:var(--muted)}
+
+/* ── ANIMATIONS ───────────────────────────────────────────────── */
+@keyframes fadeDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes bounceY{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+/* ── UTILITIES ────────────────────────────────────────────────── */
+.divider{height:1px;background:var(--border);margin:2.5rem 0}
+.tag-row{display:flex;gap:.5rem;flex-wrap:wrap;margin:.8rem 0}
+.tag{font-size:.68rem;padding:.25rem .6rem;border-radius:5px;font-family:var(--font-mono)}
+section{margin-bottom:4rem}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-bg"></div>
+  <div class="grid-lines"></div>
+  <div class="hero-content">
+    <span class="badge">🎓 ISTQB CT-GenAI v1.0</span>
+    <h1>Hands-On<br/><span>Project Workbook</span></h1>
+    <p>5 practical mini-projects — one per chapter — to deeply reinforce your CT-GenAI exam prep. Built for engineers who learn by doing.</p>
+    <div class="hero-cta">
+      <a href="#projects" class="btn btn-primary">▶ Start Projects</a>
+      <a href="#llm-setup" class="btn btn-outline">🆓 Free LLM Setup</a>
+      <a href="#github" class="btn btn-outline">🚀 Deploy to GitHub</a>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="stat-n">5</div><div class="stat-l">Chapters</div></div>
+      <div class="stat"><div class="stat-n">5</div><div class="stat-l">Projects</div></div>
+      <div class="stat"><div class="stat-n">4–6h</div><div class="stat-l">Total Time</div></div>
+      <div class="stat"><div class="stat-n">$0</div><div class="stat-l">Cost</div></div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <span>scroll to explore</span>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+  </div>
+</section>
+
+<!-- NAV -->
+<nav id="main-nav">
+  <a href="#top">Home</a>
+  <a href="#llm-setup">Free LLMs</a>
+  <a href="#projects">Projects</a>
+  <a href="#ch1">Ch 1</a>
+  <a href="#ch2">Ch 2</a>
+  <a href="#ch3">Ch 3</a>
+  <a href="#ch4">Ch 4</a>
+  <a href="#ch5">Ch 5</a>
+  <a href="#github">GitHub Deploy</a>
+</nav>
+
+<main>
+
+<!-- ── FREE LLM SETUP ──────────────────────────────────────────── -->
+<section id="llm-setup">
+  <div class="section-header">
+    <span class="section-tag" style="color:var(--accent3)">Step 0 · Before you start</span>
+    <h2 class="section-title">Free LLM Accounts to Sign Up</h2>
+    <p class="section-sub">All free. No credit card needed for the basic tiers. Sign up for at least 2 so you can compare behaviours (which the syllabus actually recommends!).</p>
+  </div>
+
+  <div class="llm-grid">
+
+    <div class="llm-card" style="--lc:#10a37f">
+      <div class="llm-card-top">
+        <div class="llm-logo">🤖</div>
+        <div>
+          <span class="llm-name">ChatGPT</span>
+          <span class="llm-free">FREE</span>
+        </div>
+      </div>
+      <div class="llm-desc">Best all-rounder. GPT-4o available free. File uploads, image input (multimodal), code execution. Biggest community of testers using it.</div>
+      <div class="llm-caps">
+        <span class="cap">Text</span><span class="cap">Images</span><span class="cap">Code</span><span class="cap">File Upload</span>
+      </div>
+      <a href="https://chat.openai.com" target="_blank" class="llm-link" style="--lc:#10a37f">→ chat.openai.com</a>
+    </div>
+
+    <div class="llm-card" style="--lc:#cc785c">
+      <div class="llm-card-top">
+        <div class="llm-logo">🔶</div>
+        <div>
+          <span class="llm-name">Claude (claude.ai)</span>
+          <span class="llm-free">FREE</span>
+        </div>
+      </div>
+      <div class="llm-desc">You're using it right now! Excellent at structured tasks, long documents, and nuanced instruction-following. Free tier is generous.</div>
+      <div class="llm-caps">
+        <span class="cap">Text</span><span class="cap">Images</span><span class="cap">Long Context</span><span class="cap">Docs</span>
+      </div>
+      <a href="https://claude.ai" target="_blank" class="llm-link" style="--lc:#cc785c">→ claude.ai</a>
+    </div>
+
+    <div class="llm-card" style="--lc:#4285f4">
+      <div class="llm-card-top">
+        <div class="llm-logo">💎</div>
+        <div>
+          <span class="llm-name">Gemini</span>
+          <span class="llm-free">FREE</span>
+        </div>
+      </div>
+      <div class="llm-desc">Google's LLM. Great for multimodal tasks — paste screenshots directly. Integrates with Google Workspace. Good for comparing responses.</div>
+      <div class="llm-caps">
+        <span class="cap">Text</span><span class="cap">Images</span><span class="cap">Search</span><span class="cap">Google Docs</span>
+      </div>
+      <a href="https://gemini.google.com" target="_blank" class="llm-link" style="--lc:#4285f4">→ gemini.google.com</a>
+    </div>
+
+    <div class="llm-card" style="--lc:#6366f1">
+      <div class="llm-card-top">
+        <div class="llm-logo">📔</div>
+        <div>
+          <span class="llm-name">NotebookLM</span>
+          <span class="llm-free">FREE</span>
+        </div>
+      </div>
+      <div class="llm-desc">Google's RAG tool. Upload your own documents and the LLM answers ONLY from them. Perfect for the Chapter 4 RAG project.</div>
+      <div class="llm-caps">
+        <span class="cap">RAG</span><span class="cap">PDF Upload</span><span class="cap">Q&A</span><span class="cap">Summaries</span>
+      </div>
+      <a href="https://notebooklm.google.com" target="_blank" class="llm-link" style="--lc:#6366f1">→ notebooklm.google.com</a>
+    </div>
+
+    <div class="llm-card" style="--lc:#f97316">
+      <div class="llm-card-top">
+        <div class="llm-logo">🦙</div>
+        <div>
+          <span class="llm-name">Meta AI</span>
+          <span class="llm-free">FREE</span>
+        </div>
+      </div>
+      <div class="llm-desc">Llama-based model, completely free, no rate limits. Access via WhatsApp, Instagram, or meta.ai. Good for comparing foundation vs tuned models.</div>
+      <div class="llm-caps">
+        <span class="cap">Text</span><span class="cap">Images</span><span class="cap">No Limits</span>
+      </div>
+      <a href="https://www.meta.ai" target="_blank" class="llm-link" style="--lc:#f97316">→ meta.ai</a>
+    </div>
+
+    <div class="llm-card" style="--lc:#e879f9">
+      <div class="llm-card-top">
+        <div class="llm-logo">🌐</div>
+        <div>
+          <span class="llm-name">Perplexity AI</span>
+          <span class="llm-free">FREE</span>
+        </div>
+      </div>
+      <div class="llm-desc">LLM + web search combined. Great for Chapter 3 — research AI standards (ISO 42001, EU AI Act) live. Shows sources, reducing hallucination risk.</div>
+      <div class="llm-caps">
+        <span class="cap">Web Search</span><span class="cap">Citations</span><span class="cap">Research</span>
+      </div>
+      <a href="https://perplexity.ai" target="_blank" class="llm-link" style="--lc:#e879f9">→ perplexity.ai</a>
+    </div>
+
+  </div>
+
+  <div style="margin-top:1.2rem;padding:1rem 1.4rem;border-radius:12px;background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.2);font-size:.82rem;line-height:1.7;color:var(--text)">
+    <strong style="color:var(--accent)">✅ Recommended setup:</strong> Sign up for ChatGPT + Claude + NotebookLM. That covers text, multimodal, and RAG — enough for all 5 projects.
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── PROJECTS ────────────────────────────────────────────────── -->
+<section id="projects">
+  <div class="section-header">
+    <span class="section-tag" style="color:var(--accent)">Hands-On Projects</span>
+    <h2 class="section-title">Chapter-by-Chapter Projects</h2>
+    <p class="section-sub">Click any chapter to expand the full project guide with steps, prompt templates, and a completion checklist.</p>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-bar-wrap">
+    <div class="prog-top">
+      <span class="prog-title">Overall Progress</span>
+      <span class="prog-pct" id="prog-pct">0 / 20 tasks</span>
+    </div>
+    <div class="bar"><div class="bar-fill" id="prog-bar"></div></div>
+    <div class="prog-labels">
+      <span class="prog-label">Ch 1</span>
+      <span class="prog-label">Ch 2</span>
+      <span class="prog-label">Ch 3</span>
+      <span class="prog-label">Ch 4</span>
+      <span class="prog-label">Ch 5</span>
+    </div>
+  </div>
+
+  <div class="chapter-grid" id="ch1-anchor">
+
+    <!-- ── CHAPTER 1 ── -->
+    <div class="chapter-card" style="--ch-color:#38bdf8" id="ch1">
+      <div class="ch-header" onclick="toggleChapter(this)">
+        <div class="ch-icon">🧠</div>
+        <div class="ch-meta">
+          <div class="ch-num">Chapter 1 · 100 min</div>
+          <div class="ch-title">LLM Explorer — Compare 3 LLMs Side by Side</div>
+          <div class="ch-desc">Understand GenAI foundations by experiencing LLM differences hands-on</div>
+        </div>
+        <span class="ch-weight">~45 min</span>
+        <span class="ch-toggle">▼</span>
+      </div>
+      <div class="ch-body">
+        <div class="project-block">
+          <div class="project-label">🎯 What you'll learn</div>
+          <div class="project-name">LLM Explorer</div>
+          <div class="project-desc">You'll prompt 3 different LLMs with the exact same test-related prompt and compare their outputs. This directly maps to the syllabus concept of Foundation vs Instruction-tuned vs Reasoning LLMs — you'll <em>feel</em> the difference rather than just reading about it.</div>
+          <div class="llm-row">
+            <span class="llm-badge" style="background:rgba(16,163,127,.15);color:#10a37f;border:1px solid rgba(16,163,127,.3)">ChatGPT</span>
+            <span class="llm-badge" style="background:rgba(204,120,92,.15);color:#cc785c;border:1px solid rgba(204,120,92,.3)">Claude</span>
+            <span class="llm-badge" style="background:rgba(66,133,244,.15);color:#4285f4;border:1px solid rgba(66,133,244,.3)">Gemini</span>
+          </div>
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-n">1</div>
+            <div class="step-text"><strong>Pick a simple app to test</strong> — use a login page or signup form. It can be totally imaginary. Just write: "The app has a username field, password field, and a Login button."</div>
+          </div>
+          <div class="step">
+            <div class="step-n">2</div>
+            <div class="step-text"><strong>Run this same prompt in all 3 LLMs</strong> and save each response in a doc or notes app. See the prompt template below.</div>
+          </div>
+          <div class="step">
+            <div class="step-n">3</div>
+            <div class="step-text"><strong>Try the multimodal step:</strong> Go to Gemini or ChatGPT. Take a screenshot of any app's login page (your email, bank, any app). Upload the image and ask: "Generate 5 test cases from this UI screenshot."</div>
+          </div>
+          <div class="step">
+            <div class="step-n">4</div>
+            <div class="step-text"><strong>Compare and note:</strong> Which LLM gave more specific test cases? Which one mentioned edge cases? Which felt more creative? Write 3 bullet observations.</div>
+          </div>
+        </div>
+
+        <div class="prompt-box">
+          <span class="prompt-box-label">📋 Prompt Template</span>
+          <button class="copy-btn" onclick="copyPrompt(this)">copy</button>
+          <pre><span class="hl">Role:</span> You are a senior software QA engineer.
+
+<span class="hl">Context:</span> We are testing a simple login page. It has:
+- A username field (accepts email format)
+- A password field (min 8 characters)
+- A "Login" button
+- A "Forgot Password" link
+
+<span class="hl">Instruction:</span> Generate 8 test cases for this login page.
+
+<span class="hl">Constraints:</span> Include at least 2 negative test cases 
+and 1 boundary value test case.
+
+<span class="hl">Output Format:</span> Return as a numbered list with:
+Test ID | Test Case Name | Steps | Expected Result</pre>
+        </div>
+
+        <div class="outcome">
+          <div class="outcome-label">✅ What you'll have learned</div>
+          <p>You'll see how Instruction-tuned LLMs (ChatGPT, Claude) follow structure better than general models. You'll understand tokenization/context by noticing when an LLM "loses" info from a long prompt. Multimodal exercise ties directly to syllabus section 1.1.4.</p>
+        </div>
+
+        <div class="checklist" id="cl-ch1">
+          <div class="check-item"><input type="checkbox" id="c1-1" onchange="updateProgress()"><label for="c1-1">Set up at least 2 LLM accounts</label></div>
+          <div class="check-item"><input type="checkbox" id="c1-2" onchange="updateProgress()"><label for="c1-2">Ran the same prompt on 3 LLMs and saved responses</label></div>
+          <div class="check-item"><input type="checkbox" id="c1-3" onchange="updateProgress()"><label for="c1-3">Tried multimodal: uploaded a UI screenshot for test case gen</label></div>
+          <div class="check-item"><input type="checkbox" id="c1-4" onchange="updateProgress()"><label for="c1-4">Wrote 3 comparison observations in my notes</label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CHAPTER 2 ── -->
+    <div class="chapter-card" style="--ch-color:#34d399" id="ch2">
+      <div class="ch-header" onclick="toggleChapter(this)">
+        <div class="ch-icon">⚗️</div>
+        <div class="ch-meta">
+          <div class="ch-num">Chapter 2 · 365 min · MOST IMPORTANT</div>
+          <div class="ch-title">Prompt Lab — Build Your Personal Prompt Library</div>
+          <div class="ch-desc">Master the 6-part structure + 5 techniques across real test tasks</div>
+        </div>
+        <span class="ch-weight">~120 min</span>
+        <span class="ch-toggle">▼</span>
+      </div>
+      <div class="ch-body">
+        <div class="project-block">
+          <div class="project-label">🎯 What you'll learn</div>
+          <div class="project-name">The Prompt Lab</div>
+          <div class="project-desc">You'll run 3 distinct prompt engineering exercises — each targeting a different technique. By the end you'll have a real personal prompt library: reusable templates for test analysis, test design, and test data generation.</div>
+          <div class="llm-row">
+            <span class="llm-badge" style="background:rgba(16,163,127,.15);color:#10a37f;border:1px solid rgba(16,163,127,.3)">ChatGPT</span>
+            <span class="llm-badge" style="background:rgba(204,120,92,.15);color:#cc785c;border:1px solid rgba(204,120,92,.3)">Claude</span>
+          </div>
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-n">A</div>
+            <div class="step-text"><strong>Exercise A — Zero-shot vs Few-shot:</strong> Use the zero-shot prompt below to generate acceptance criteria. Then use the few-shot version. Compare quality. You'll see immediately why examples matter.</div>
+          </div>
+          <div class="step">
+            <div class="step-n">B</div>
+            <div class="step-text"><strong>Exercise B — Prompt Chaining (3 steps):</strong> Step 1: Ask LLM to extract all testable conditions from a user story. Step 2: Feed that output back — ask it to generate test cases for each condition. Step 3: Ask it to flag which test cases should be automated first.</div>
+          </div>
+          <div class="step">
+            <div class="step-n">C</div>
+            <div class="step-text"><strong>Exercise C — Meta Prompting:</strong> Ask the LLM: "Write me the best possible prompt to generate synthetic test data for an e-commerce checkout that covers edge cases without exposing real PII." Then use that AI-generated prompt!</div>
+          </div>
+          <div class="step">
+            <div class="step-n">D</div>
+            <div class="step-text"><strong>Save your 3 best prompts</strong> in a <code>prompt-library.md</code> file. This becomes your personal study artifact and exam memory aid.</div>
+          </div>
+        </div>
+
+        <div class="prompt-box">
+          <span class="prompt-box-label">📋 Few-Shot Prompt Template (Exercise A)</span>
+          <button class="copy-btn" onclick="copyPrompt(this)">copy</button>
+          <pre><span class="hl">Role:</span> You are a QA engineer writing acceptance criteria in 
+Gherkin format.
+
+<span class="hl">Context:</span> We're testing an e-commerce checkout module.
+
+<span class="hl">Examples (few-shot):</span>
+User Story: "User can apply discount code"
+Acceptance Criteria:
+  Given a valid discount code exists
+  When the user enters the code at checkout
+  Then the discount is applied to the total
+
+User Story: "User can save payment method"
+Acceptance Criteria:
+  Given the user is logged in
+  When they enter valid card details and check "Save"
+  Then the payment method is stored securely
+
+<span class="hl">Instruction:</span> Now write acceptance criteria for:
+"As a user, I want to receive an order confirmation email 
+after placing an order."
+
+<span class="hl">Constraints:</span> Include at least one negative scenario.
+<span class="hl">Output Format:</span> Gherkin (Given/When/Then)</pre>
+        </div>
+
+        <div class="outcome">
+          <div class="outcome-label">✅ What you'll have learned</div>
+          <p>You'll have hands-on experience with all 5 prompting techniques. You'll understand exactly why the 6-part structure improves output quality. Your prompt library is a real deliverable you can reference on exam day.</p>
+        </div>
+
+        <div class="checklist">
+          <div class="check-item"><input type="checkbox" id="c2-1" onchange="updateProgress()"><label for="c2-1">Ran zero-shot vs few-shot and compared acceptance criteria quality</label></div>
+          <div class="check-item"><input type="checkbox" id="c2-2" onchange="updateProgress()"><label for="c2-2">Completed 3-step prompt chaining exercise</label></div>
+          <div class="check-item"><input type="checkbox" id="c2-3" onchange="updateProgress()"><label for="c2-3">Used meta prompting to generate a test data prompt</label></div>
+          <div class="check-item"><input type="checkbox" id="c2-4" onchange="updateProgress()"><label for="c2-4">Saved 3 prompts in prompt-library.md</label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CHAPTER 3 ── -->
+    <div class="chapter-card" style="--ch-color:#f472b6" id="ch3">
+      <div class="ch-header" onclick="toggleChapter(this)">
+        <div class="ch-icon">🔍</div>
+        <div class="ch-meta">
+          <div class="ch-num">Chapter 3 · 160 min</div>
+          <div class="ch-title">Risk Lab — Spot the Hallucination &amp; Attack the LLM</div>
+          <div class="ch-desc">Discover GenAI defects and security risks by deliberately triggering them</div>
+        </div>
+        <span class="ch-weight">~60 min</span>
+        <span class="ch-toggle">▼</span>
+      </div>
+      <div class="ch-body">
+        <div class="project-block">
+          <div class="project-label">🎯 What you'll learn</div>
+          <div class="project-name">The Risk Lab</div>
+          <div class="project-desc">You'll deliberately create conditions that trigger hallucinations, reasoning errors, and privacy risks — then apply mitigations and see the improvement. This is the most memorable way to learn Chapter 3 content.</div>
+          <div class="llm-row">
+            <span class="llm-badge" style="background:rgba(16,163,127,.15);color:#10a37f;border:1px solid rgba(16,163,127,.3)">ChatGPT</span>
+            <span class="llm-badge" style="background:rgba(204,120,92,.15);color:#cc785c;border:1px solid rgba(204,120,92,.3)">Claude</span>
+          </div>
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-n">1</div>
+            <div class="step-text"><strong>Trigger a hallucination:</strong> Give the LLM a vague, fictional requirement with no context. Ask for test cases. Check if it invents features that don't exist. Note what it made up.</div>
+          </div>
+          <div class="step">
+            <div class="step-n">2</div>
+            <div class="step-text"><strong>Mitigate it:</strong> Re-run with better context and constraints. Compare how many "invented" test cases disappear when you improve the prompt.</div>
+          </div>
+          <div class="step">
+            <div class="step-n">3</div>
+            <div class="step-text"><strong>Test temperature:</strong> If using ChatGPT API playground (free), set temperature to 0.0 then 1.5 on the same prompt. See how consistency changes. With Claude/ChatGPT chat, try "Be very precise and deterministic" vs "Be creative" in the system prompt.</div>
+          </div>
+          <div class="step">
+            <div class="step-n">4</div>
+            <div class="step-text"><strong>Privacy exercise:</strong> Ask LLM to generate test data for a user registration form. Notice if it creates realistic-looking names/emails/phone numbers (PII risk). Then ask it to generate <em>synthetic</em> data instead. Compare the two outputs.</div>
+          </div>
+          <div class="step">
+            <div class="step-n">5</div>
+            <div class="step-text"><strong>Research standards:</strong> Go to Perplexity.ai and search "ISO 42001 AI management system summary". Read what it returns. Note: this is grounded, cited output — much less hallucination risk than a plain LLM answer.</div>
+          </div>
+        </div>
+
+        <div class="prompt-box">
+          <span class="prompt-box-label">📋 Hallucination Trigger Prompt</span>
+          <button class="copy-btn" onclick="copyPrompt(this)">copy</button>
+          <pre><span class="hl">Vague prompt (will likely hallucinate):</span>
+Generate test cases for the XYZ banking app.
+
+<span class="hl">---</span>
+<span class="hl">Improved prompt (reduces hallucination):</span>
+Role: You are a QA engineer.
+Context: We are testing a banking app with ONLY these features:
+  1. View account balance
+  2. Transfer money between own accounts
+  3. View last 10 transactions
+Instruction: Generate 6 test cases covering ONLY the features listed above.
+Constraints: Do NOT add test cases for features not listed.
+Output Format: Table with columns: ID | Feature | Test Case | Expected Result
+
+<span class="hl">After running both, check:</span>
+Did the vague prompt invent features like "loan application" 
+or "credit card payment"? That's a hallucination!</pre>
+        </div>
+
+        <div class="outcome">
+          <div class="outcome-label">✅ What you'll have learned</div>
+          <p>You'll have directly experienced all 3 GenAI defects. You'll understand that better prompts = fewer hallucinations. You'll know what synthetic test data looks like vs PII-containing data. All Chapter 3 exam scenarios will feel familiar.</p>
+        </div>
+
+        <div class="checklist">
+          <div class="check-item"><input type="checkbox" id="c3-1" onchange="updateProgress()"><label for="c3-1">Triggered a hallucination with a vague prompt and identified invented features</label></div>
+          <div class="check-item"><input type="checkbox" id="c3-2" onchange="updateProgress()"><label for="c3-2">Re-ran with improved prompt and counted hallucination reduction</label></div>
+          <div class="check-item"><input type="checkbox" id="c3-3" onchange="updateProgress()"><label for="c3-3">Compared PII-containing vs synthetic test data outputs</label></div>
+          <div class="check-item"><input type="checkbox" id="c3-4" onchange="updateProgress()"><label for="c3-4">Researched ISO 42001 using a cited/grounded LLM tool</label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CHAPTER 4 ── -->
+    <div class="chapter-card" style="--ch-color:#a78bfa" id="ch4">
+      <div class="ch-header" onclick="toggleChapter(this)">
+        <div class="ch-icon">🏗️</div>
+        <div class="ch-meta">
+          <div class="ch-num">Chapter 4 · 110 min</div>
+          <div class="ch-title">RAG in Action — Build a Test Q&amp;A Bot from Your Own Docs</div>
+          <div class="ch-desc">Experience RAG architecture firsthand using free no-code tools</div>
+        </div>
+        <span class="ch-weight">~45 min</span>
+        <span class="ch-toggle">▼</span>
+      </div>
+      <div class="ch-body">
+        <div class="project-block">
+          <div class="project-label">🎯 What you'll learn</div>
+          <div class="project-name">RAG in Action</div>
+          <div class="project-desc">Using Google's free NotebookLM tool, you'll upload a test requirements document and see RAG in action — the LLM answers questions grounded in YOUR document, not hallucinated from training. Then you'll compare with and without RAG.</div>
+          <div class="llm-row">
+            <span class="llm-badge" style="background:rgba(99,102,241,.15);color:#6366f1;border:1px solid rgba(99,102,241,.3)">NotebookLM</span>
+            <span class="llm-badge" style="background:rgba(16,163,127,.15);color:#10a37f;border:1px solid rgba(16,163,127,.3)">ChatGPT</span>
+          </div>
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-n">1</div>
+            <div class="step-text"><strong>Create your test document:</strong> Write a simple 1-page requirements doc for a fictional app. Include 5 specific features with details. Save as a PDF or Google Doc. (You can use AI to generate this doc first!)</div>
+          </div>
+          <div class="step">
+            <div class="step-n">2</div>
+            <div class="step-text"><strong>Without RAG (baseline):</strong> Go to ChatGPT. Paste just the app name (e.g., "MediTrack — a medical appointment app"). Ask: "What test cases should I write?" See what it generates — it'll make assumptions.</div>
+          </div>
+          <div class="step">
+            <div class="step-n">3</div>
+            <div class="step-text"><strong>With RAG via NotebookLM:</strong> Go to notebooklm.google.com → Create notebook → Upload your requirements doc. Now ask the same question. See how it references specific sections from YOUR document.</div>
+          </div>
+          <div class="step">
+            <div class="step-n">4</div>
+            <div class="step-text"><strong>The "agent" simulation:</strong> Back in ChatGPT, try this: "You are a test agent. Here is a user story: [paste one]. Plan your testing steps, generate test cases, and identify which should be automated. Think step by step before answering."</div>
+          </div>
+          <div class="step">
+            <div class="step-n">5</div>
+            <div class="step-text"><strong>Note your observations:</strong> How different were the RAG vs non-RAG answers? What did the agent reasoning look like? Save these as your Chapter 4 notes.</div>
+          </div>
+        </div>
+
+        <div class="prompt-box">
+          <span class="prompt-box-label">📋 Agent Simulation Prompt</span>
+          <button class="copy-btn" onclick="copyPrompt(this)">copy</button>
+          <pre><span class="hl">Role:</span> You are an LLM-powered test agent.
+
+<span class="hl">Context:</span> You have been given a new user story to test.
+
+<span class="hl">User Story:</span> "As a doctor, I want to view a patient's 
+appointment history so I can prepare for consultations."
+
+<span class="hl">Instruction:</span> Act as an autonomous test agent. Follow these steps:
+STEP 1: Identify all testable conditions from the user story.
+STEP 2: Generate test cases for each condition.
+STEP 3: Flag which test cases are highest priority.
+STEP 4: Recommend which ones to automate.
+
+<span class="hl">Constraints:</span> Think through each step before proceeding to the next.
+Show your reasoning.
+<span class="hl">Output Format:</span> Use headers for each STEP.</pre>
+        </div>
+
+        <div class="outcome">
+          <div class="outcome-label">✅ What you'll have learned</div>
+          <p>You'll have directly experienced RAG — seeing how grounding an LLM in your documents reduces hallucinations. You'll understand why vector databases and chunking matter. The agent exercise shows you how LLM-powered agents think in steps.</p>
+        </div>
+
+        <div class="checklist">
+          <div class="check-item"><input type="checkbox" id="c4-1" onchange="updateProgress()"><label for="c4-1">Created a test requirements document for a fictional app</label></div>
+          <div class="check-item"><input type="checkbox" id="c4-2" onchange="updateProgress()"><label for="c4-2">Ran the no-RAG baseline in ChatGPT</label></div>
+          <div class="check-item"><input type="checkbox" id="c4-3" onchange="updateProgress()"><label for="c4-3">Uploaded doc to NotebookLM and ran RAG Q&A</label></div>
+          <div class="check-item"><input type="checkbox" id="c4-4" onchange="updateProgress()"><label for="c4-4">Ran the LLM agent simulation and noted step-by-step reasoning</label></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CHAPTER 5 ── -->
+    <div class="chapter-card" style="--ch-color:#fbbf24" id="ch5">
+      <div class="ch-header" onclick="toggleChapter(this)">
+        <div class="ch-icon">🗺️</div>
+        <div class="ch-meta">
+          <div class="ch-num">Chapter 5 · 80 min</div>
+          <div class="ch-title">Strategy Sprint — Write a GenAI Testing Strategy for a Fictional Team</div>
+          <div class="ch-desc">Apply all 5 chapters into a real strategy doc — exam-scenario thinking</div>
+        </div>
+        <span class="ch-weight">~45 min</span>
+        <span class="ch-toggle">▼</span>
+      </div>
+      <div class="ch-body">
+        <div class="project-block">
+          <div class="project-label">🎯 What you'll learn</div>
+          <div class="project-name">Strategy Sprint</div>
+          <div class="project-desc">You'll write a 1-page GenAI Testing Strategy document for a fictional 5-person test team — then use an LLM to critique and improve it. This synthesises all 5 chapters and perfectly mirrors the thinking required for Chapter 5 exam questions.</div>
+          <div class="llm-row">
+            <span class="llm-badge" style="background:rgba(204,120,92,.15);color:#cc785c;border:1px solid rgba(204,120,92,.3)">Claude</span>
+            <span class="llm-badge" style="background:rgba(16,163,127,.15);color:#10a37f;border:1px solid rgba(16,163,127,.3)">ChatGPT</span>
+          </div>
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-n">1</div>
+            <div class="step-text"><strong>Define your fictional team:</strong> 5 testers at a fintech startup. They test a mobile banking app. No AI tools yet. Some testers are using ChatGPT secretly (Shadow AI!).</div>
+          </div>
+          <div class="step">
+            <div class="step-n">2</div>
+            <div class="step-text"><strong>Write your strategy using the template below.</strong> Fill in all 6 sections. Don't overthink — this is your exam practice, not a real deliverable.</div>
+          </div>
+          <div class="step">
+            <div class="step-n">3</div>
+            <div class="step-text"><strong>Use LLM to critique it:</strong> Paste your strategy into Claude or ChatGPT and ask: "Review this GenAI testing strategy. Identify gaps based on ISTQB CT-GenAI best practices. Suggest improvements."</div>
+          </div>
+          <div class="step">
+            <div class="step-n">4</div>
+            <div class="step-text"><strong>Identify your phase:</strong> Based on the adoption roadmap, which phase is your fictional team in? Phase 1 (Exploration)? Justify your answer in 2 sentences.</div>
+          </div>
+        </div>
+
+        <div class="prompt-box">
+          <span class="prompt-box-label">📋 Strategy Document Template</span>
+          <button class="copy-btn" onclick="copyPrompt(this)">copy</button>
+          <pre><span class="hl">GenAI Testing Strategy — FinTech Mobile Banking App</span>
+Team size: 5 testers | App: Mobile Banking
+
+<span class="hl">1. Test Objectives (What will GenAI help with?)</span>
+   e.g., Test case generation from user stories, 
+   synthetic test data for security testing...
+
+<span class="hl">2. LLM Selection</span>
+   Tool: _____ | Reason: _____
+   (Consider: cost, data privacy, context window)
+
+<span class="hl">3. Shadow AI Prevention</span>
+   Current risk: Testers using ChatGPT informally.
+   Mitigation: _____
+
+<span class="hl">4. Data Privacy Approach</span>
+   What data can be sent to the LLM? _____
+   What must stay internal? _____
+
+<span class="hl">5. Adoption Phase</span>
+   Current phase: Phase 1 / 2 / 3
+   Reason: _____
+
+<span class="hl">6. Compliance</span>
+   Relevant standards: ISO _____, EU AI Act: _____
+   
+<span class="hl">--- Paste this into an LLM and ask it to critique ---</span></pre>
+        </div>
+
+        <div class="outcome">
+          <div class="outcome-label">✅ What you'll have learned</div>
+          <p>You'll have synthesised all 5 chapters into one coherent strategic view. Shadow AI, LLM selection criteria, privacy, compliance, and the adoption roadmap will all be concrete in your mind. This directly mirrors how Chapter 5 questions are framed.</p>
+        </div>
+
+        <div class="checklist">
+          <div class="check-item"><input type="checkbox" id="c5-1" onchange="updateProgress()"><label for="c5-1">Defined fictional team context and identified Shadow AI risk</label></div>
+          <div class="check-item"><input type="checkbox" id="c5-2" onchange="updateProgress()"><label for="c5-2">Filled in all 6 sections of the strategy template</label></div>
+          <div class="check-item"><input type="checkbox" id="c5-3" onchange="updateProgress()"><label for="c5-3">Used LLM to critique and improve the strategy</label></div>
+          <div class="check-item"><input type="checkbox" id="c5-4" onchange="updateProgress()"><label for="c5-4">Identified adoption phase and justified in 2 sentences</label></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /chapter-grid -->
+</section>
+
+<div class="divider"></div>
+
+<!-- ── GITHUB DEPLOY ────────────────────────────────────────────── -->
+<section id="github">
+  <div class="section-header">
+    <span class="section-tag" style="color:var(--accent5)">Deploy · GitHub Pages</span>
+    <h2 class="section-title">Deploy This Workbook to GitHub</h2>
+    <p class="section-sub">Host your own copy for free on GitHub Pages. Share it, customise it, add your notes.</p>
+  </div>
+
+  <div class="gh-steps">
+
+    <div class="gh-step">
+      <div class="gh-num">1</div>
+      <div class="gh-content">
+        <div class="gh-title">Create a GitHub Account (if you don't have one)</div>
+        <div class="gh-desc">Go to <a href="https://github.com" target="_blank" style="color:var(--accent)">github.com</a> → Sign up → Free plan is perfect. Verify your email.</div>
+      </div>
+    </div>
+
+    <div class="gh-step">
+      <div class="gh-num">2</div>
+      <div class="gh-content">
+        <div class="gh-title">Download the Project Files</div>
+        <div class="gh-desc">Download <code>index.html</code>, <code>README.md</code>, and <code>prompt-library.md</code> from this workbook to your computer. Put them in a folder called <code>istqb-genai-workbook</code>.</div>
+      </div>
+    </div>
+
+    <div class="gh-step">
+      <div class="gh-num">3</div>
+      <div class="gh-content">
+        <div class="gh-title">Create a New Repository</div>
+        <div class="gh-desc">On GitHub: Click "+" → New repository → Name it <code>istqb-genai-workbook</code> → Set to Public → Click "Create repository".</div>
+      </div>
+    </div>
+
+    <div class="gh-step">
+      <div class="gh-num">4</div>
+      <div class="gh-content">
+        <div class="gh-title">Upload Your Files</div>
+        <div class="gh-desc">Option A (easy — no terminal): On your new repo page → "Add file" → "Upload files" → drag all 3 files → Click "Commit changes".</div>
+        <div class="code-block">
+<span class="cmt"># Option B — terminal (if you prefer Git CLI)</span>
+<span class="cmd">git init</span>
+<span class="cmd">git add .</span>
+<span class="cmd">git commit -m "Initial: ISTQB CT-GenAI workbook"</span>
+<span class="cmd">git branch -M main</span>
+<span class="cmd">git remote add origin https://github.com/YOUR_USERNAME/istqb-genai-workbook.git</span>
+<span class="cmd">git push -u origin main</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="gh-step">
+      <div class="gh-num">5</div>
+      <div class="gh-content">
+        <div class="gh-title">Enable GitHub Pages</div>
+        <div class="gh-desc">In your repo: Settings → Pages (left sidebar) → Source: "Deploy from a branch" → Branch: main → Folder: / (root) → Save. Wait 2 minutes.</div>
+      </div>
+    </div>
+
+    <div class="gh-step">
+      <div class="gh-num">6</div>
+      <div class="gh-content">
+        <div class="gh-title">🎉 Your site is live!</div>
+        <div class="gh-desc">Your workbook will be available at:</div>
+        <div class="code-block">
+<span class="cmd">https://YOUR_USERNAME.github.io/istqb-genai-workbook</span>
+        </div>
+        <div class="gh-desc" style="margin-top:.6rem">Bookmark this URL. Share it. Every time you push a new commit, the site updates automatically in ~60 seconds.</div>
+      </div>
+    </div>
+
+    <div class="gh-step">
+      <div class="gh-num">+</div>
+      <div class="gh-content">
+        <div class="gh-title">Add Your Prompt Library as You Go</div>
+        <div class="gh-desc">As you complete each project, add your best prompts to <code>prompt-library.md</code> and push to GitHub. By Week 4 you'll have a complete study artifact to review before the exam.</div>
+        <div class="code-block">
+<span class="cmt"># Quick update workflow</span>
+<span class="cmd">git add prompt-library.md</span>
+<span class="cmd">git commit -m "Add Chapter 2 few-shot prompts"</span>
+<span class="cmd">git push</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:1.5rem;padding:1.2rem 1.4rem;border-radius:12px;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.25);font-size:.85rem;line-height:1.75;color:var(--text)">
+    <strong style="color:var(--accent5)">💡 Pro tip:</strong> Add your completed strategy doc, comparison notes, and prompt library to the repo. By the time you sit the exam, your GitHub repo becomes a complete portfolio of your CT-GenAI practical learning — useful for job interviews too!
+  </div>
+</section>
+
+</main>
+
+<script>
+// ── TOGGLE CHAPTERS ─────────────────────────────────────────────────────
+function toggleChapter(header) {
+  const body = header.nextElementSibling;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  header.classList.toggle('open', !isOpen);
+}
+
+// ── PROGRESS ────────────────────────────────────────────────────────────
+function updateProgress() {
+  const all = document.querySelectorAll('.checklist input[type=checkbox]');
+  const done = document.querySelectorAll('.checklist input[type=checkbox]:checked');
+  const total = all.length;
+  const count = done.length;
+  const pct = total ? Math.round(count / total * 100) : 0;
+  document.getElementById('prog-bar').style.width = pct + '%';
+  document.getElementById('prog-pct').textContent = count + ' / ' + total + ' tasks';
+
+  // mark done items
+  all.forEach(cb => {
+    const item = cb.closest('.check-item');
+    item.classList.toggle('done', cb.checked);
+  });
+
+  // save to localStorage
+  const state = {};
+  all.forEach(cb => state[cb.id] = cb.checked);
+  try { localStorage.setItem('istqb_progress', JSON.stringify(state)); } catch(e){}
+}
+
+// restore progress
+function restoreProgress() {
+  try {
+    const state = JSON.parse(localStorage.getItem('istqb_progress') || '{}');
+    Object.entries(state).forEach(([id, checked]) => {
+      const el = document.getElementById(id);
+      if(el) el.checked = checked;
+    });
+    updateProgress();
+  } catch(e){}
+}
+
+// ── COPY PROMPT ──────────────────────────────────────────────────────────
+function copyPrompt(btn) {
+  const pre = btn.closest('.prompt-box').querySelector('pre');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'copied!';
+    btn.style.background = 'var(--accent3)';
+    btn.style.color = '#000';
+    setTimeout(() => { btn.textContent = 'copy'; btn.style.background = ''; btn.style.color = ''; }, 2000);
+  });
+}
+
+// ── NAV SCROLL SPY ───────────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  const links = document.querySelectorAll('nav a');
+  links.forEach(a => {
+    const id = a.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    a.classList.toggle('active', rect.top <= 120 && rect.bottom > 0);
+  });
+});
+
+restoreProgress();
+</script>
+</body>
+</html>
